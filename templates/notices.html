@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block title %}Manage Notices{% endblock %}
+{% block content %}
+<div class="row fade-up my-4">
+    <div class="col-md-8">
+        <h2 class="page-title m-0"><i class="las la-bullhorn me-1"></i>Institute Noticeboard</h2>
+        <p class="text-muted">Broadcast urgent messages to all student and teacher dashboards.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Notice List -->
+    <div class="col-md-8 fade-up-2">
+        <form method="GET" class="mb-3 d-flex gap-2">
+            <input type="date" name="search_date" class="form-control" style="max-width: 200px;" value="{{ search_date }}">
+            <button type="submit" class="btn btn-primary-ui"><i class="las la-search"></i> Search Date</button>
+            {% if search_date %}
+            <a href="{{ url_for('manage_notices') }}" class="btn btn-light border">Clear</a>
+            {% endif %}
+        </form>
+        <div class="card-ui p-0">
+            <table class="table table-ui mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Title & Message</th>
+                        <th>Author</th>
+                        <th width="80">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notice in notices %}
+                    <tr>
+                        <td style="white-space: nowrap;">{{ notice.date_posted }}</td>
+                        <td>
+                            <strong class="d-block text-dark">{{ notice.title }}</strong>
+                            <span class="text-muted small">{{ notice.message | safe }}</span>
+                        </td>
+                        <td><small>{{ notice.author }}</small></td>
+                        <td>
+                            {% if session.get('role') == 'admin' %}
+                            <form method="POST" onsubmit="return confirm('Delete this notice?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="notice_id" value="{{ notice.id }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i class="las la-trash"></i></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">No notices have been posted.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Notice Sidebar -->
+    {% if session.get('role') == 'admin' %}
+    <div class="col-md-4 fade-up-3">
+        <div class="card-ui p-4">
+            <h5 class="fw-bold mb-3"><i class="las la-plus-circle text-primary"></i> Create Notice</h5>
+            <form method="POST">
+                <input type="hidden" name="action" value="add">
+                <div class="mb-3">
+                    <label class="form-label fw-600">Headline</label>
+                    <input type="text" name="title" class="form-control" required placeholder="e.g. Midterm Exams">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Message (HTML Allowed)</label>
+                    <textarea name="message" class="form-control" rows="5" required placeholder="You can paste links like <a href='https://link.com'>Click Here</a>"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary-ui w-100">Broadcast Notice</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% block title %}Student Portal{% endblock %}
+{% block content %}
+<div class="row fade-up my-4">
+    <div class="col-md-8">
+        <h2 class="page-title m-0">Welcome back, {{ student.full_name }}! 👋</h2>
+        <p class="text-muted">Student Portal Dashboard</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <button class="btn btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#leaveModal">
+            <i class="las la-calendar-times"></i> Request Leave
+        </button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Quick Stats -->
+    <div class="col-md-8 fade-up-2">
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card-ui p-4 mb-3 text-center">
+                    <h5 class="text-muted mb-2">Overall Attendance</h5>
+                    <h1 class="display-4 fw-bold {% if att_pct >= 75 %}text-success{% elif att_pct >= 50 %}text-warning{% else %}text-danger{% endif %}">{{ att_pct }}%</h1>
+                    <div class="progress-slim mt-3 mx-auto" style="max-width:200px;">
+                        <div class="bar {% if att_pct >= 75 %}bg-success{% elif att_pct >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width:{{ att_pct }}%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-ui p-4 mb-3 text-center">
+                    <h5 class="text-muted mb-2">Assignments</h5>
+                    <h1 class="display-4 fw-bold text-primary">{{ hw_pct }}%</h1>
+                    <div class="progress-slim mt-3 mx-auto" style="max-width:200px;">
+                        <div class="bar bg-primary" style="width:{{ hw_pct }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-ui p-4">
+            <h5 class="fw-bold mb-3"><i class="las la-clipboard-list text-primary"></i> Recent Attendance Records</h5>
+            <table class="table table-ui mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.record_date }}</td>
+                        <td>{{ r.subject_name }}</td>
+                        <td>
+                            <span class="badge badge-pill
+                                {% if r.status=='Present' %}bg-success{% elif r.status=='Absent' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No attendance marked yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Notices & Leaves Sidebar -->
+    <div class="col-md-4 fade-up-3">
+        <div class="card-ui p-4 mb-4" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); color:white;">
+            <h5 class="fw-bold mb-3"><i class="las la-bullhorn"></i> Institute Noticeboard</h5>
+            {% for notice in notices %}
+            <div class="bg-white text-dark p-3 rounded shadow-sm mb-3">
+                <div class="small text-muted float-end">{{ notice.date_posted }}</div>
+                <h6 class="fw-bold mb-1">{{ notice.title }}</h6>
+                <p class="small mb-2">{{ notice.message | safe }}</p>
+                <div class="small fw-600 text-primary">— {{ notice.author }}</div>
+            </div>
+            {% else %}
+            <div class="rounded p-3 text-center" style="background:rgba(255,255,255,0.1);">
+                No urgent notices at this time.
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card-ui p-4">
+            <h5 class="fw-bold mb-3"><i class="las la-calendar-day text-warning"></i> My Leave Requests</h5>
+            {% for leaf in my_leaves %}
+            <div class="border-bottom pb-2 mb-2">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ leaf.start_date }} - {{ leaf.end_date }}</strong>
+                    <span class="badge {% if leaf.status == 'Approved' %}bg-success{% elif leaf.status == 'Rejected' %}bg-danger{% else %}bg-secondary{% endif %}">{{ leaf.status }}</span>
+                </div>
+                <small class="text-muted d-block">{{ leaf.reason }}</small>
+            </div>
+            {% else %}
+            <small class="text-muted">You have no leave requests.</small>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Leave Request Modal -->
+<div class="modal fade" id="leaveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('manage_leaves') }}" class="modal-content border-0 shadow-lg" style="border-radius:14px;">
+            <div class="modal-header border-bottom px-4 pt-4">
+                <h5 class="modal-title fw-bold"><i class="las la-calendar-plus text-primary me-1"></i> Request Leave of Absence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="fw-600 mb-1">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-600 mb-1">End Date</label>
+                        <input type="date" name="end_date" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="fw-600 mb-1">Reason for Leave</label>
+                        <textarea name="reason" rows="4" class="form-control" placeholder="Please specify your reason clearly..." required></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 px-4 pb-4">
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary-ui">Submit Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

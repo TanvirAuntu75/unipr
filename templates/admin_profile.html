@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="my-4 fade-up">
+    <h2 class="page-title m-0"><i class="las la-user-cog me-1"></i>Profile Settings</h2>
+    <p class="text-muted">Manage your administrative details.</p>
+</div>
+
+<div class="row fade-up-2">
+    <div class="col-md-6">
+        <div class="card-ui p-4">
+            <form method="POST">
+                <div class="mb-3 text-center">
+                    <img src="https://ui-avatars.com/api/?name={{ user.full_name }}&background=1e3a8a&color=fff&size=128" class="rounded-circle shadow-sm border p-1" width="100">
+                    <p class="mt-2 text-muted small">Account Type: <span class="badge bg-primary">{{ user.role | upper }}</span></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Username</label>
+                    <input type="text" class="form-control bg-light" value="{{ user.username }}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Full Display Name</label>
+                    <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ user.email or '' }}" placeholder="Enter system email">
+                </div>
+                <hr class="my-4">
+                <button type="submit" class="btn btn-primary-ui w-100">Update Profile Settings</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card-ui p-4 bg-light border-0">
+            <h6 class="fw-bold"><i class="las la-shield-alt text-primary"></i> Password Security</h6>
+            <p class="small text-muted">To change your login password, please contact the lead administrator or use the terminal command line tools.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

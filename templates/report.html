@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block title %}System Reports{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4 fade-up">
+    <div>
+        <h2 class="page-title m-0"><i class="las la-chart-bar me-1"></i>Attendance Intelligence</h2>
+        <p class="text-muted mb-0">Comprehensive tracking and analytics across all departments.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-success bg-white border" onclick="exportTableToExcel('reportTable', 'CPI-Report')">
+            <i class="las la-file-excel me-1"></i> Export Excel
+        </button>
+        <button class="btn btn-primary-ui" onclick="exportPDF()">
+            <i class="las la-file-pdf me-1"></i> Export PDF
+        </a>
+    </div>
+</div>
+
+<div class="card-ui p-0 fade-up-2 shadow-sm" id="reportContent">
+    <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+        <input type="text" id="reportSearch" class="form-control form-control-sm w-25" placeholder="Search report...">
+        <span class="small text-muted">Auto-calculated based on all registered subjects.</span>
+    </div>
+    <table class="table table-ui mb-0" id="reportTable">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Department</th>
+                <th>Total Days</th>
+                <th>Days Present</th>
+                <th>Percentage</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in data %}
+            <tr>
+                <td>
+                    <div class="fw-600">{{ s.name }}</div>
+                    <div class="small text-muted">{{ s.id }}</div>
+                </td>
+                <td>{{ s.dept }}</td>
+                <td>{{ s.total }}</td>
+                <td class="text-success fw-bold">{{ s.present }}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress-slim w-100" style="max-width: 100px;">
+                            <div class="bar {% if s.pct >= 75 %}bg-success{% elif s.pct >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ s.pct }}%;"></div>
+                        </div>
+                        <span class="fw-600">{{ s.pct }}%</span>
+                    </div>
+                </td>
+                <td>
+                    {% if s.pct < 75 %}
+                    <span class="badge bg-danger">Critical Warning</span>
+                    {% else %}
+                    <span class="badge bg-success">Satisfactory</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function exportTableToExcel(tableID, filename = ''){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById(tableID);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    
+    filename = filename?filename+'.xls':'excel_data.xls';
+    downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob){
+        var blob = new Blob(['\ufeff', tableHTML], { type: dataType });
+        navigator.msSaveOrOpenBlob( blob, filename);
+    } else {
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+        downloadLink.download = filename;
+        downloadLink.click();
+    }
+}
+
+function exportPDF() {
+    const element = document.getElementById('reportContent');
+    const opt = {
+        margin: 10,
+        filename: 'CPI_Attendance_Report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+{% endblock %}

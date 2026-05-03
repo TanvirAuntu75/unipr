@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Add Student{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4 fade-up">
+    <h2 class="page-title m-0"><i class="las la-user-plus me-1"></i>New Student Enrollment</h2>
+</div>
+
+<div class="row justify-content-center fade-up-2">
+    <div class="col-md-6">
+        <div class="card-ui p-4">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-600">Student ID *</label>
+                    <input type="text" name="student_id" class="form-control" placeholder="e.g. STU-2026-001" required>
+                    <small class="text-muted">This will also be used as the initial password.</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Full Name *</label>
+                    <input type="text" name="full_name" class="form-control" placeholder="Enter legal name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Department / Section</label>
+                    <input type="text" name="department" class="form-control" placeholder="e.g. Computer Science">
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-600">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="student@example.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-600">Phone Number</label>
+                        <input type="text" name="phone" class="form-control" placeholder="+880...">
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-top d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-ui px-5">Register Student</button>
+                    <a href="{{ url_for('student_list') }}" class="btn btn-light border px-4">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

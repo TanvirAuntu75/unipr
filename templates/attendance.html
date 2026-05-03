@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block title %}Mark Attendance{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center my-4 fade-up">
+    <h2 class="page-title m-0"><i class="las la-check-double me-1"></i>Attendance Mark-Sheet</h2>
+</div>
+
+<form method="POST" class="fade-up-2">
+    <div class="card-ui p-4 mb-4 bg-light">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label fw-600">Select Subject</label>
+                <select name="subject_id" class="form-select" required>
+                    <option value="" disabled selected>Choose a subject...</option>
+                    {% for sub in subjects %}
+                    <option value="{{ sub.id }}">{{ sub.code }} - {{ sub.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-600">Record Date</label>
+                <input type="date" name="date" class="form-control" value="{{ today_date }}" required>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary-ui w-100">Submit Attendance</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-ui p-0">
+        <table class="table table-ui mb-0">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Status Selection</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td class="fw-bold">{{ s.student_id }}</td>
+                    <td class="fw-600">{{ s.full_name }}</td>
+                    <td>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="status_{{ s.student_id }}" id="pres_{{ s.student_id }}" value="Present" checked>
+                            <label class="btn btn-outline-success btn-sm py-2" for="pres_{{ s.student_id }}"><i class="las la-check me-1"></i>Present</label>
+
+                            <input type="radio" class="btn-check" name="status_{{ s.student_id }}" id="abs_{{ s.student_id }}" value="Absent">
+                            <label class="btn btn-outline-danger btn-sm py-2" for="abs_{{ s.student_id }}"><i class="las la-times me-1"></i>Absent</label>
+
+                            <input type="radio" class="btn-check" name="status_{{ s.student_id }}" id="late_{{ s.student_id }}" value="Late">
+                            <label class="btn btn-outline-warning btn-sm py-2 text-dark" for="late_{{ s.student_id }}"><i class="las la-clock me-1"></i>Late</label>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<script>
+    // Set today's date as default in the input
+    document.querySelector('input[type="date"]').valueAsDate = new Date();
+</script>
+{% endblock %}
